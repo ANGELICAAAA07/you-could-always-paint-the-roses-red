@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Chapters</title>
+    <style>
+         :root {
+            --bg-color: #310000;
+            --accent-pink: #ffffff;
+            --gothic: 'UnifrakturMaguntia', cursive;
+            --glass: rgba(0, 0, 0, 0.6);
+        }
+
+        /* 1. Custom Cursor */
+        #cursor-follower {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--accent-pink);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            transition: transform 0.1s ease-out;
+            transform: translate(-50%, -50%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Times New Roman", Times, serif; }
+
+        body {
+            background-image: url('driedrose.jpg');
+            background-size: cover;      
+            background-repeat: no-repeat; 
+            background-position: center;
+        }
+
+        header {
+            background-color: #3e13137d;
+            padding: 20px 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 a {
+            text-decoration: none;
+            color: white;
+            font-family: var(--gothic);
+            font-size: 32px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 20px;
+            font-family: var(--gothic);
+            position: relative;
+            transition: 0.3s;
+        }
+
+        nav a:hover { color: var(--accent-pink); text-shadow: 0 0 8px var(--accent-pink); }
+
+        /* 2. Magnetic Nav Line */
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent-pink);
+            transition: width 0.3s ease;
+        }
+        nav a:hover::after { width: 100%; }
+
+        section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+        }
+
+        /* 3. Glassmorphism Diary Entries */
+        .diary-entry {
+            background: var(--glass); 
+            backdrop-filter: blur(12px);
+            color: white; 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 50px;
+            width: 100%;
+            max-width: 850px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s ease;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .diary-entry:hover {
+            transform: scale(1.01);
+            border-color: var(--accent-pink);
+            box-shadow: 0 25px 50px rgba(250, 250, 250, 0.7), 0 0 15px rgba(255, 182, 193, 0.1);
+        }
+
+        .diary-entry h3 {
+            font-family: var(--gothic);
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: var(--accent-pink);
+            border-bottom: 1px solid rgba(255, 182, 193, 0.3);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .diary-entry p {
+            font-size: 20px;
+            line-height: 1.8;
+            text-align: justify;
+            color: #efefef;
+        }
+        .song-title {
+            position: fixed;
+            bottom: 30px; /* Locked visibly right at the base */
+            left: 50%;
+            transform: translateX(-50%); /* Keeps bar perfectly centered horizontally */
+            background: rgba(0, 0, 0, 0.368);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(166, 58, 58, 0.4);
+            color: var(--text-color);
+            padding: 12px 25px;
+            border-radius: 30px; 
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(166, 58, 58, 0.2);
+            width: max-content;
+        }
+
+        .audio-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Crimson Controller Action Toggle Button */
+        #audioIcon {
+            background: var(--accent-color);
+            color: #ffffff;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        #audioIcon:hover {
+            transform: scale(1.1);
+            background: #403e3e;
+        }
+
+        .track-meta {
+            display: flex;
+            flex-direction: column;
+            font-family: 'Crimson Pro', serif;
+        }
+
+        .track-name {
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        .artist-name {
+            font-size: 0.75rem;
+            color: #6d6a67;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- Audio Wave Equalizer System --- */
+        .wave {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            opacity: 0; 
+            transition: opacity 0.3s ease;
+            height: 18px;
+        }
+
+        .wave span {
+            width: 3px;
+            height: 100%;
+            background: var(--accent-color); 
+            transform: scaleY(0.3);
+            transform-origin: bottom;
+        }
+
+        /* State triggers for running track animations */
+        .wave.active span {
+            animation: bounce 0.8s infinite ease-in-out;
+        }
+
+        .wave span:nth-child(2) { animation-delay: 0.2s; }
+        .wave span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: scaleY(0.3); }
+            50% { transform: scaleY(1.3); }
+        }
+
+        .wave.active {
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="cursor-follower"></div>
+
+<header id="top">
+    <h1><a href="index.html">𝕸𝖞 𝕮𝖍𝖆𝖕𝖙𝖊𝖗𝖘</a></h1>
+<nav>
+            <a href="index.html">ℌ𝔬𝔪𝔢</a>
+            <a href="chapter1.html"> ℭ𝔥𝔞𝔭𝔱𝔢𝔯𝔰</a>
+            <a href="memory.html"> 𝔐𝔢𝔪𝔬𝔯𝔶</a>
+            <a href="contact.html"> ℭ𝔬𝔫𝔱𝔞𝔠𝔱</a>
+        </div>
+    </nav>
+    </header>
+
+    <!-- Main Notebook Presentation Card Layout -->
+   <section>
+    <div class="diary-entry">
+        <h3>𝕮𝖍𝖆𝖕𝖙𝖊𝖗 1: 𝕿𝖍𝖊 𝖂𝖊𝖎𝖌𝖍𝖙 𝖔𝖋 𝖂𝖆𝖎𝖙𝖎𝖓𝔤</h3>
+        <p style="text-indent: 30px;"> She sat on his bed, doomscrolling on her phone, waiting for him to finish what he was doing. The silence between them was heavy, dense, and filled with the lingering ghosts of their shared past.</p>
+           <p style="text-indent: 30px;"><span class="dialogue"> <em> "I still can't believe that this is happening,"</em></span> he said. His voice was softer than she had ever heard it. He stepped closer, closing the physical distance that had kept them apart for so long.</p>
+            <p class="story-p">She looked up at him, her expression guarded. Only a few months ago, he had walked away from her without a backward glance, trading their years of love for someone entirely new. The shock of that betrayal had shattered her completely, leaving an ache she was only just learning to manage.</p>
+           <p style="text-indent: 30px;">Yet, here he was.</p>
+           <p style="text-indent: 30px;">Slowly, deliberately, he dropped to his knees right in front of her, begging for a new start. He had spent the last two weeks swearing up and down that he had changed. Over and over, he kept insisting that their separation was the catalyst he needed—that losing her made him finally realize her true value and the immense, quiet sacrifices she had always made to keep them together.</p>
+        <p style="text-indent: 30px;"><em>"I made a mistake. A horrific mistake,"</em> he murmured, his eyes glassy with unshed tears as he looked up into her face. <em> had to lose you to realize that everything I ever wanted was right here in front of me."</em></p> </div>
+
+    <div class="diary-entry">
+        <h3>𝕮𝖍𝖆𝖕𝖙𝖊𝖗 2: 𝕿𝖍𝖊 𝕴𝖑𝖑𝖚𝖘𝖎𝖔𝖓 𝖔𝖋 𝖆 𝕹𝖊𝖜 𝕭𝖊𝖌𝖎𝖓𝖓𝖎𝖓𝖌</h3>
+        <p style="text-indent: 30px;">After hours of listening to his desperate explanations, she felt her high walls finally crumbling. The love hadn't gone away; it had just been buried deep under months of grief. </p>
+        <p style="text-indent: 20px;">Looking at him now, she chose to forgive him. </p>
+        <p style="text-indent: 30px;"> When he pulled her against his chest for the first time in months, she felt a faint, fragile flicker of genuine happiness. They were back together. It was a new beginning.</p>
+        <p style="text-indent: 30px;"> Shortly after, he went to the bathroom to start cleaning up his apartment. She stayed behind on his bed, letting her eyes wander aimlessly around the room. For the first time in a very long time, it felt good to breathe without a sharp ache in her chest.</p>
+    </div>
+
+    <div class="diary-entry">
+        <h3>𝕮𝖍𝖆𝖕𝖙𝖊𝖗 3: 𝕿𝖍𝖊 𝕿𝖔𝖕 𝕾𝖍𝖊𝖑𝖋</h3>
+        <p style="text-indent: 30px;"> Wanting to help him tidy up, she decided to look around for any stray trash. She stood up on his bed, taking a step toward his tall bookshelf to check the upper ledges.</p>
+        <p>Then she saw it.</p> 
+        <p style="text-indent: 30px;">Tucked into the far corner of the top shelf was a bouquet of dried flowers. The petals were faded, their deep red hues muted by time, but they were carefully, deliberately preserved.</p>
+       <p> She froze. Her breath caught tight in her throat.</p>
+        <p style="text-indent: 30px;">Instantly, the fragile happiness that had just begun to bloom inside her evaporated. It was violently replaced by a wave of hot, searing anger and suffocating pain. She stared at the dried petals, and her mind flashed backward through years of ordinary weekdays. </p></div>
+
+    <div class="diary-entry">
+        <h3>𝕮𝖍𝖆𝖕𝖙𝖊𝖗 4: 𝕻𝖗𝖔𝖔𝖋 𝖔𝖋 𝕮𝖆𝖕𝖆𝖈𝖎𝖙𝖞</h3>
+         <p style="text-indent: 30px;"> He had never once brought her flowers. Not even a single rose.</p>
+         <p> She remembered the agonizing nights she had spent crying alone in her bed, pleading with him to just be effortless with his affection. Romance was her ultimate dream—to be loved the way she loved him, to receive anything small that proved he was thinking of her. Every single time she asked, he just brushed it off. He complained that he "just wasn't the romantic type."</p>
+        <p style="text-indent: 30px;">But the dried flowers on the shelf told a completely different story.</p>
+       <p> It was proof. Proof that he was the romantic type. He was entirely capable of buying flowers. He was capable of preserving memories. He was fully capable of giving the exact fairy-tale romance she had spent years begging for.</p>
+        <p style="text-indent: 30px;"> He had just chosen to give it to someone else. </p> </div>
+
+     <div class="diary-entry">
+        <h3>𝕮𝖍𝖆𝖕𝖙𝖊𝖗 5: 𝕯𝖊𝖛𝖆𝖘𝖙𝖆𝖙𝖎𝖓𝖌 𝕸𝖚𝖘𝖎𝖈</h3>
+        <p style="text-indent: 30px;"> A hollow laugh escaped her lips, carrying a sarcastic, <em>"Aww, so sweet,"</em> into the quiet room. But the sharp sarcasm could not wash away the hot tears pooling in her eyes. </p>
+        <p> Hearing her, he rushed over, scrambling for excuses. He claimed defensively that the flowers were nothing more than a forgotten <em>piece of trash </em> he had simply forgotten to throw away.</p>
+        <p style="text-indent: 30px;"><h4> But for her, it was not just flowers. </h4></p>
+        <p style="text-indent: 30px;"> His desperate excuses fell on completely deaf ears. She just kept laughing. It was a beautiful, devastating sound—the noise of a heart breaking all over again while trying to pretend it felt nothing at all.</p>
+     </div>
+</section>
+
+
+    <audio id="myAudio">
+        <source src="K. - Cigarettes After Sex [L4sbDxR22z4].mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Horizontally Anchored Central Sound Interface Deck Component -->
+    <div class="song-title" id="songTitle">
+        <div class="audio-container">
+            <button id="audioIcon">▶</button>
+            <div class="track-meta">
+                <p class="track-name"> K.</p>
+                <p class="artist-name">Cigarettes After Sex</p>
+            </div>
+            <div class="wave" id="wave">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Operational Event Engine Hooks Scripts Matrix -->
+    <script>
+            <!-- Fixed Core Script Orchestration Engine (Instant Binding) -->
+        // 1. Custom Mouse Pointer Tracking System Coordinator
+        const cursor = document.getElementById('cursor');
+        if (cursor) {
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX - 10 + 'px';
+                cursor.style.top = e.clientY - 10 + 'px';
+            });
+
+            document.querySelectorAll('a, #audioIcon').forEach(link => {
+                link.addEventListener('mouseenter', () => cursor.style.transform = 'scale(2)');
+                link.addEventListener('mouseleave', () => cursor.style.transform = 'scale(1)');
+            });
+        }
+
+        // 2. Direct Audio Engine Binding (No DOMContentLoaded Wait)
+        const audio = document.getElementById("myAudio");
+        const icon = document.getElementById("audioIcon");
+        const wave = document.getElementById("wave");
+
+        let isPlaying = false;
+
+        if (icon && audio) {
+            icon.onclick = () => {
+                if (isPlaying) {
+                    audio.pause();
+                    icon.innerText = "▶";
+                    if (wave) wave.classList.remove("active");
+                    isPlaying = false;
+                } else {
+                    // Triggers audio stream immediately
+                    audio.play()
+                        .then(() => {
+                            icon.innerText = "⏸";
+                            if (wave) wave.classList.add("active");
+                            isPlaying = true;
+                        })
+                        .catch(err => {
+                            // If browser blocks initial click, force icon toggle anyway
+                            console.log("Browser block captured. Swapping icon status.");
+                            icon.innerText = "⏸";
+                            if (wave) wave.classList.add("active");
+                            isPlaying = true;
+                        });
+                }
+            };
+        }
+    </script>
+</body>
+</html>
+
